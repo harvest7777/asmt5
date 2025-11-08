@@ -20,6 +20,7 @@ class Matrix:
         """
         Changes the i-th row to be the list new_row.
         Raises ValueError if new_row does not have the same length as existing rows.
+        Indexing is 1-based.
         """
         if len(self.rows) == 0:
             raise ValueError("Matrix has no rows.")
@@ -27,19 +28,24 @@ class Matrix:
         if len(new_row) != len(self.rows[0]):
             raise ValueError("Incompatible row length.")
 
-        self.rows[i] = new_row
+        if not (1 <= i <= len(self.rows)):
+            raise IndexError("Row index out of bounds: 1 <= i <= m required.")
+
+        self.rows[i-1] = new_row
         self._construct_cols()
     
     def set_col(self, j, new_col):
         """
-        Changes the j-th column to be the list new_col.
+        Changes the j-th column (1-based indexing) to be the list new_col.
         Raises ValueError if new_col does not have the same length as existing columns.
         """
         if len(self.cols) == 0:
             raise ValueError("Matrix has no columns.")
         if len(new_col) != len(self.cols[0]):
             raise ValueError("Incompatible column length.")
-        self.cols[j] = new_col
+        if not (1 <= j <= len(self.cols)):
+            raise IndexError("Column index out of bounds: 1 <= j <= n required.")
+        self.cols[j-1] = new_col
         self._construct_rows()
 
     def set_entry(self, i, j, val):
@@ -58,6 +64,47 @@ class Matrix:
 
         self.rows[i-1][j-1] = val
 
+    def get_rows(self):
+        """
+        Returns the rows of the matrix as a list of lists.
+        """
+        return self.rows
+    
+    def get_columns(self):
+        """
+        Returns the columns of the matrix as a list of lists.
+        """
+        return self.cols
+    
+    def get_diag(self, d):
+        """
+        Returns the d-th diagonal of the matrix as a list.
+        Indexing is 0-based.
+        Raises IndexError if 0 <= d < n is not satisfied, where n = number of columns.
+        """
+        m = len(self.rows)
+        n = len(self.cols)
+
+        # bounds check
+        if d >= n or d <= -m:
+            raise IndexError("Diagonal index out of bounds.")
+
+        diag = []
+        if d >= 0:
+            # upper or main diagonal
+            length = min(m, n - d)
+            for i in range(length):
+                diag.append(self.rows[i][i + d])
+        else:
+            # lower diagonal
+            d = abs(d)
+            length = min(m - d, n)
+            for i in range(length):
+                diag.append(self.rows[i + d][i])
+
+        return diag
+
+    
     def get_row(self, i):
         """
         Returns the i-th row as a list.
@@ -176,17 +223,40 @@ class Matrix:
         :return: Matrix type; the Matrix object resulting from the Matrix + Matrix operation
         """
         if type(other) == float or type(other) == int:
-            print("FIXME: Insert implementation of MATRIX-SCALAR multiplication"
-                  )  # FIXME: REPLACE WITH IMPLEMENTATION
+            # MATRIX-SCALAR multiplication
+            new_rows = [
+                [entry * other for entry in row]
+                for row in self.rows
+            ]
+            return Matrix(new_rows)
         elif type(other) == Matrix:
-            print("FIXME: Insert implementation of MATRIX-MATRIX multiplication"
-                  )  # FIXME: REPLACE WITH IMPLEMENTATION
+            # MATRIX-MATRIX multiplication
+            m, n = self.dim()
+            p, q = other.dim()
+            if n != p:
+                raise ValueError(
+                    "Matrix multiplication requires the first matrix's number of columns to equal the second's number of rows."
+                )
+            result = []
+            for i in range(m):
+                row = []
+                for j in range(q):
+                    val = sum(self.rows[i][k] * other.rows[k][j] for k in range(n))
+                    row.append(val)
+                result.append(row)
+            return Matrix(result)
         elif type(other) == Vec:
-            print("FIXME: Insert implementation for MATRIX-VECTOR multiplication"
-                  )  # FIXME: REPLACE WITH IMPLEMENTATION
+            # MATRIX-VECTOR multiplication
+            m, n = self.dim()
+            if len(other.elements) != n:
+                raise ValueError("Matrix-Vector multiplication: dimensions mismatch")
+            result = []
+            for i in range(m):
+                val = sum(self.rows[i][j] * other.elements[j] for j in range(n))
+                result.append(val)
+            return Vec(result)
         else:
             raise TypeError(f"Matrix * {type(other)} is not supported.")
-        return
 
     def __rmul__(self, other):
         """
@@ -199,11 +269,9 @@ class Matrix:
         :return: Matrix type; the Matrix object resulting from the Matrix + Matrix operation
         """
         if type(other) == float or type(other) == int:
-            print("FIXME: Insert implementation of SCALAR-MATRIX multiplication"
-                  )  # FIXME: REPLACE WITH IMPLEMENTATION
+            return self.__mul__(other)
         else:
             raise TypeError(f"{type(other)} * Matrix is not supported.")
-        return
 
     '''-------- ALL METHODS BELOW THIS LINE ARE FULLY IMPLEMENTED -------'''
 
