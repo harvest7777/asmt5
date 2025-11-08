@@ -1,5 +1,5 @@
 from Vec import Vec
-
+import math
 """-------------------- PROBLEM 1 --------------------"""
 class Matrix:
 
@@ -18,9 +18,7 @@ class Matrix:
   """
     def set_row(self, i, new_row):
         """
-        Changes the i-th row to be the list new_row.
-        Raises ValueError if new_row does not have the same length as existing rows.
-        Indexing is 1-based.
+        # sets the i-th row to new_row. make sure new_row is right length. uses 1-based indexing.
         """
         if len(self.rows) == 0:
             raise ValueError("Matrix has no rows.")
@@ -36,8 +34,7 @@ class Matrix:
     
     def set_col(self, j, new_col):
         """
-        Changes the j-th column (1-based indexing) to be the list new_col.
-        Raises ValueError if new_col does not have the same length as existing columns.
+        # sets the j-th column to new_col. make sure new_col is right length. uses 1-based indexing.
         """
         if len(self.cols) == 0:
             raise ValueError("Matrix has no columns.")
@@ -50,9 +47,7 @@ class Matrix:
 
     def set_entry(self, i, j, val):
         """
-        Changes the existing a_{i,j} entry in the matrix to val.
-        Indexing is 1-based.
-        Raises IndexError if i does not satisfy 1 <= i <= m or j does not satisfy 1 <= j <= n.
+        # sets the (i,j)-th entry to val. uses 1-based indexing.
         """
         m = len(self.rows)
         n = len(self.rows[0]) if m > 0 else 0
@@ -67,21 +62,20 @@ class Matrix:
 
     def get_rows(self):
         """
-        Returns the rows of the matrix as a list of lists.
+        # returns the rows of the matrix as a list of lists.
         """
         return self.rows
     
     def get_columns(self):
         """
-        Returns the columns of the matrix as a list of lists.
+        # returns the columns of the matrix as a list of lists.
         """
         return self.cols
     
     def get_diag(self, d):
         """
-        Returns the d-th diagonal of the matrix as a list.
-        Indexing is 0-based.
-        Raises IndexError if 0 <= d < n is not satisfied, where n = number of columns.
+        # returns the d-th diagonal of the matrix as a list.
+        uses 0-based indexing.
         """
         m = len(self.rows)
         n = len(self.cols)
@@ -108,9 +102,7 @@ class Matrix:
     
     def get_row(self, i):
         """
-        Returns the i-th row as a list.
-        Indexing is 1-based.
-        Raises IndexError if 1 <= i <= m is not satisfied, where m = number of rows.
+        # returns the i-th row as a list. uses 1-based indexing.
         """
         m = len(self.rows)
         if not (1 <= i <= m):
@@ -119,9 +111,7 @@ class Matrix:
 
     def get_col(self, j):
         """
-        Returns the j-th column as a list.
-        Indexing is 1-based.
-        Raises IndexError if 1 <= j <= n is not satisfied, where n = number of columns.
+        # returns the j-th column as a list. uses 1-based indexing.
         """
         n = len(self.cols)
         if not (1 <= j <= n):
@@ -130,9 +120,7 @@ class Matrix:
 
     def get_entry(self, i, j):
         """
-        Returns the a_{i,j} entry in the matrix.
-        Indexing is 1-based.
-        Raises IndexError if i or j do not satisfy the proper bounds.
+        # returns the (i,j)-th entry in the matrix. uses 1-based indexing.
         """
         m = len(self.rows)
         n = len(self.rows[0]) if m > 0 else 0
@@ -144,7 +132,7 @@ class Matrix:
 
     def _construct_cols(self):
         """
-        HELPER METHOD: Resets the columns according to the existing rows
+        # resets the columns according to the existing rows
         """
         self.cols = []
         if not self.rows:
@@ -159,7 +147,7 @@ class Matrix:
 
     def _construct_rows(self):
         """
-        HELPER METHOD: Resets the rows according to the existing columns
+        # resets the rows according to the existing columns
         """
         self.rows = []
         if not self.cols:
@@ -273,7 +261,7 @@ class Matrix:
             return self.__mul__(other)
         else:
             raise TypeError(f"{type(other)} * Matrix is not supported.")
-
+    
     '''-------- ALL METHODS BELOW THIS LINE ARE FULLY IMPLEMENTED -------'''
 
     def dim(self):
@@ -333,4 +321,13 @@ def rotate_2Dvec(v: Vec, tau: float):
     :param tau: float type; the radians to rotate by
     :return: Vec type; the rotated vector
     """
-    pass  # FIXME: REPLACE WITH IMPLEMENTATION
+    x = v.elements[0]
+    y = v.elements[1]
+
+    cos_tau = math.cos(tau)
+    sin_tau = math.sin(tau)
+
+    x_rot = x * cos_tau - y * sin_tau
+    y_rot = x * sin_tau + y * cos_tau
+
+    return Vec([x_rot, y_rot])
