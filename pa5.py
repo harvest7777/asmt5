@@ -41,7 +41,7 @@ class Matrix:
         """
         if len(self.cols) == 0:
             raise ValueError("Matrix has no columns.")
-        if len(new_col) != len(self.cols[0]):
+        if len(new_col) != len(self.rows):
             raise ValueError("Incompatible column length.")
         if not (1 <= j <= len(self.cols)):
             raise IndexError("Column index out of bounds: 1 <= j <= n required.")
@@ -63,6 +63,7 @@ class Matrix:
             raise IndexError("Column index out of bounds: 1 <= j <= n required.")
 
         self.rows[i-1][j-1] = val
+        self._construct_cols()
 
     def get_rows(self):
         """
